@@ -13,4 +13,14 @@ export default function middleware(req: NextRequest) {
       return NextResponse.rewrite(url)
     }
   }
+  // if (req.nextUrl.pathname == '/' || req.nextUrl.pathname === '/blog') {
+  //   console.log('middle: ', req.nextUrl.pathname)
+  //   const pathname = req.nextUrl.pathname;
+  //   const searchParams = req.nextUrl.searchParams
+  //   const keyword = encodeOptions({
+  //     kw: searchParams.get('kw')
+  //   })
+
+  // return NextResponse.rewrite(new URL(`${pathname !== '/' ? `${pathname}/` : ''}${keyword}`, req.nextUrl));
+  // }
 }

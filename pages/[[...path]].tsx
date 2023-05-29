@@ -1,20 +1,32 @@
 import type { GetStaticPropsContext, InferGetStaticPropsType } from 'next'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
-import { BuilderComponent, Builder, builder } from '@builder.io/react'
+import { useEffect, Fragment }  from 'react'
+import { BuilderComponent, Builder, builder, BuilderContent } from '@builder.io/react'
 import builderConfig from '@config/builder'
-import DefaultErrorPage from 'next/error'
+import Custom404 from './404';
 import Head from 'next/head'
 import { Link } from '@components/Link/Link'
 import { getTargetingValues } from '@builder.io/personalization-utils'
+import $ from "jquery";
+
+import { setPixelProperties } from '@builder.io/utils';
+
+const mylocale = 'en-fr';
+
+//builder.setUserAttribute({ queryParam: "user=2" });
+
+builder.init("c782aff3c66f48acb425981b997feb10");
 
 export async function getStaticProps({
   params,
 }: GetStaticPropsContext<{ path: string[] }>) {
+
   const isPersonalizedRequest = params?.path?.[0].startsWith(';')
+ 
   const page =
     (await builder
-      .get('page', {
+      .get('page', {  
         apiKey: builderConfig.apiKey,
         userAttributes: isPersonalizedRequest
           ? {
@@ -23,11 +35,21 @@ export async function getStaticProps({
             }
           : {
               urlPath: '/' + (params?.path?.join('/') || ''),
+              locale: mylocale,
+              custom: "custom attribute",
             },
+        options: {
+              locale: mylocale
+        },    
         cachebust: true,
       })
       .toPromise()) || null
+      
+      // Track conversion
+      builder.trackConversion(99.99);
+      //setPixelProperties(page, { alt: 'pixel tag from welcome...1111' });
 
+ 
   return {
     props: {
       page,
@@ -43,6 +65,9 @@ export async function getStaticPaths() {
   const pages = await builder.getAll('page', {
     options: { noTargeting: true },
     apiKey: builderConfig.apiKey,
+    query:{
+      "name.$eq": "aspect-ratio"
+    },
   })
 
   return {
@@ -60,27 +85,38 @@ export default function Path({
   if (router.isFallback) {
     return <h1>Loading...</h1>
   }
-  const isLive = !Builder.isEditing && !Builder.isPreviewing
+
+
+  
+  builder.setUserAttributes({ queryParam: `user=${router.query.user}`});
+
+  const isLive = !Builder.isEditing && !Builder.isPreviewing;
+  //  if (!page && isLive && !router.query) {}
+
   if (!page && isLive) {
     return (
       <>
         <Head>
           <meta name="robots" content="noindex" />
         </Head>
-        <DefaultErrorPage statusCode={404} />
+        <BuilderComponent model="custom-404"  />
       </>
     )
   }
 
-  const { title, description, image } = page?.data! || {}
+  console.log("Test Field", eval(page));
+
+  const { title, description, image, testField } = page?.data! || {}
+  
   return (
     <>
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <script>console.log({page?.data?.testField})</script>
       </Head>
       <NextSeo
         title={title}
-        description={description}
+        description={description} // workaround remove nextSeo Description 
         openGraph={{
           type: 'website',
           title,
@@ -95,7 +131,17 @@ export default function Path({
           ],
         }}
       />
-      <BuilderComponent renderLink={Link} model="page" content={page} />
+      {/* <BuilderContent modelName='page'>
+        {(variant, loading, content) =>
+          variant ? (
+            <div>{variant.testField}</div>
+          ) : (
+            <div>Loading..</div>
+          )
+        }
+      </BuilderContent> */}
+      
+      <BuilderComponent  locale={mylocale}  model="page" content={page} data={{ test: "Hello World!!!", abtest: testField}}  context={{ $ }} />
     </>
   )
 }
