@@ -42,7 +42,7 @@
   },
   "dependencies": {
     "@builder.io/personalization-utils": "^0.0.7",
-    "@builder.io/react": "^2.1.10",
+    "@builder.io/react": "^3.0.2",
     "@builder.io/utils": "^1.1.11",
     "@builder.io/widgets": "^1.2.24",
     "@radix-ui/react-collapsible": "^1.0.2",

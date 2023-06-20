@@ -30,5 +30,5 @@ var requestOptions = {
 
 fetch("https://builder.io/api/v1/write/page", requestOptions)
   .then(response => response.text())
-  .then(result => console.log(result).)
+  .then(result => console.log(result))
   .catch(error => console.log('error', error));

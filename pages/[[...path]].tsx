@@ -9,14 +9,17 @@ import Head from 'next/head'
 import { Link } from '@components/Link/Link'
 import { getTargetingValues } from '@builder.io/personalization-utils'
 import $ from "jquery";
-
+import "@builder.io/widgets";
 import { setPixelProperties } from '@builder.io/utils';
 
 const mylocale = 'en-fr';
 
 //builder.setUserAttribute({ queryParam: "user=2" });
 
-builder.init("c782aff3c66f48acb425981b997feb10");
+
+builder.init("cdea98614de745fdb32a17d23b2dc508");
+
+builder.apiVersion = 'v3'
 
 export async function getStaticProps({
   params,
@@ -88,7 +91,7 @@ export default function Path({
 
 
   
-  builder.setUserAttributes({ queryParam: `user=${router.query.user}`});
+  //builder.setUserAttributes({ queryParam: `user=${router.query.user}`});
 
   const isLive = !Builder.isEditing && !Builder.isPreviewing;
   //  if (!page && isLive && !router.query) {}
@@ -141,7 +144,7 @@ export default function Path({
         }
       </BuilderContent> */}
       
-      <BuilderComponent  locale={mylocale}  model="page" content={page} data={{ test: "Hello World!!!", abtest: testField}}  context={{ $ }} />
+      <BuilderComponent  locale={mylocale}  model="page" content={page} data={{ test: "Hello World!!!"}} options={{ includeRefs: true }}  context={{ $ }} />
     </>
   )
 }
